@@ -388,7 +388,7 @@ def index():
         if repo.startswith("repo-"):
             repos.append(repo[5:])
     for repo in repos:
-        out += "<h3><a href=\"/{}/dir\">{}</a></h3>".format(repo, config["repo-" + repo]['name'])
+        out += "<h3><a href=\"/{}\">{}</a></h3>".format(repo, config["repo-" + repo]['name'])
     result = result.format("Repositories", "", out)
     return result
 
@@ -400,31 +400,33 @@ def get_dir_list(repo, path):
     files = files.find_all("div", {"class": "py-2"})
     tree = ""
     if path != "":
-        tree += "<h3><a href=\"/{}/dir{}\">..</a></h3>".format(repo, path + "/..")
+        tree += "<h3><a href=\"/{}{}\">..</a></h3>".format(repo, path + "/..")
     else:
         tree += "<h3><a href=\"/\">Main Page</a></h3>"
     for f in files:
         isdir = f.find("div", {"class": "flex-shrink-0"}).find("svg").get("aria-label") == "Directory"
         filename = f.find("div", {"class": "col-md-2"}).find("span").find("a").text
         if isdir:
-            tree += "<h3><i class=\"fa-solid fa-folder\" style=\"color: #FFCC4D;\"></i> <a href=\"/{}/dir{}\">{}</a></h3>".format(repo, f"{path}/{filename}", filename)
+            tree += "<h3><i class=\"fa-solid fa-folder\" style=\"color: #FFCC4D;\"></i> <a href=\"/{}{}\">{}</a></h3>".format(repo, f"{path}/{filename}", filename)
         else:
-            tree += "<h3><i class=\"fa-solid fa-file\"></i> <a href=\"/{}/file{}\">{}</a></h3>".format(repo, f"{path}/{filename}", filename)
+            tree += "<h3><i class=\"fa-solid fa-file\"></i> <a href=\"/{}{}\">{}</a></h3>".format(repo, f"{path}/{filename}", filename)
     result = result.format(config["repo-" + repo]['name'], path, tree)
     return result
 
 def show_file(repo, path):
     result = ftemplate
     req = requests.get(config["repo-" + repo]["rawurl"] + "/" + path)
+    if req.status_code == 404:
+        return None
     parents = []
     pathpar = pathlib.Path(path).parent
     while pathpar.name != "":
         parents.append(pathpar)
         pathpar = pathlib.Path(pathpar).parent
     parents.reverse()
-    pathpar = f"<a href=\"/{repo}/dir\">{config['repo-' + repo]['name']}</a>/"
+    pathpar = f"<a href=\"/{repo}\">{config['repo-' + repo]['name']}</a>/"
     for parent in parents:
-        pathpar += f"<a href=\"/{repo}/dir{str(parent)}\">{parent.name}</a>/"
+        pathpar += f"<a href=\"/{repo}{str(parent)}\">{parent.name}</a>/"
     pathfile = pathlib.Path(path).name
     if pathlib.Path(path).name in ["Makefile", "makefile"]:
         lang = "makefile"
@@ -433,17 +435,17 @@ def show_file(repo, path):
     result = result.format(config["repo-" + repo]['name'], path, f"<h2>{pathpar}{pathfile}</h2><pre class=\"linkable-line-numbers\" id=\"code\"><code class=\"language-{lang} line-numbers\">{html.escape(req.text)}</code></pre>")
     return result
 
-@app.route('/<repo>/dir/<path:path>')
+@app.route('/<repo>/<path:path>')
 def dir(repo, path):
-    return get_dir_list(repo, "/" + path)
+    f = show_file(repo, "/" + path)
+    if f is None:
+        return get_dir_list(repo, "/" + path)
+    else:
+        return f
 
-@app.route('/<repo>/dir')
+@app.route('/<repo>')
 def dirroot(repo):
     return get_dir_list(repo, "")
-
-@app.route('/<repo>/file/<path:path>')
-def file(repo, path):
-    return show_file(repo, "/" + path)
 
 @app.route('/style/apprentice.css')
 def apprentice():
