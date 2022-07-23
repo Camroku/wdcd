@@ -11,7 +11,7 @@ Cons:
 * Performance is a little too bad - it downloads an entire page on every request.
 * You have to restart the server every time you change the configuration.
 
-All of these will be fixed in future, except for the fourth one (probably?).
+All of these will be fixed in future, except for the third one (probably?).
 
 ## Installing
 Run `pip install flask requests beautifulsoup4` to install dependencies, move `wdcd.py` to `/usr/local/bin/wdcd` (`mv wdcd.py /usr/local/bin/wdcd`) and set it as executable (`chmod +x /usr/local/bin/wdcd`).
