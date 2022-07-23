@@ -18,3 +18,7 @@ Run `pip install flask requests beautifulsoup4` to install dependencies, move `w
 
 ## Running
 Create your config file by looking at the [example](config.ini) and then run `wdcd config.ini`.
+
+## Credits
+* [Arnolxu](https://github.com/Arnolxu) for the stylesheets (and literally making the project)
+* [Prism](https://github.com/PrismJS) for syntax highlighting
