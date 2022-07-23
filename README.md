@@ -8,8 +8,8 @@ Pros:
 Cons:
 * I felt too lazy to add support for every language.
 * Images are not supported.
-* No support for multiple repositories.
 * Performance is a little too bad - it downloads an entire page on every request.
+* You have to restart the server every time you change the configuration.
 
 All of these will be fixed in future, except for the fourth one (probably?).
 

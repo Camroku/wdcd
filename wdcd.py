@@ -90,58 +90,69 @@ config.read(sys.argv[1])
 
 @app.route('/')
 def index():
-    return flask.redirect("/dir")
-
-def get_dir_list(path):
+    repos = []
     result = template
-    req = requests.get(config["repo"]["dirurl"] + "/" + path)
+    out = ""
+    for repo in config.sections():
+        if repo.startswith("repo-"):
+            repos.append(repo[5:])
+    for repo in repos:
+        out += "<h3><a href=\"/{}/dir\">{}</a></h3>".format(repo, config["repo-" + repo]['name'])
+    result = result.format("Repositories", "", out)
+    return result
+
+def get_dir_list(repo, path):
+    result = template
+    req = requests.get(config["repo-" + repo]["dirurl"] + "/" + path)
     soup = bs4.BeautifulSoup(req.text, "html.parser")
     files = soup.find("div", {"aria-labelledby": "files"})
     files = files.find_all("div", {"class": "py-2"})
     tree = ""
     if path != "":
-        tree += "<h3><a href=\"/dir{}\">..</a></h3>".format(path + "/..")
+        tree += "<h3><a href=\"/{}/dir{}\">..</a></h3>".format(repo, path + "/..")
+    else:
+        tree += "<h3><a href=\"/\">Main Page</a></h3>"
     for f in files:
         isdir = f.find("div", {"class": "flex-shrink-0"}).find("svg").get("aria-label") == "Directory"
         filename = f.find("div", {"class": "col-md-2"}).find("span").find("a").text
         if isdir:
-            tree += "<h3><i class=\"fa-solid fa-folder\"></i> <a href=\"/dir{}\">{}</a></h3>".format(f"{path}/{filename}", filename)
+            tree += "<h3><i class=\"fa-solid fa-folder\" style=\"color: #FFCC4D;\"></i> <a href=\"/{}/dir{}\">{}</a></h3>".format(repo, f"{path}/{filename}", filename)
         else:
-            tree += "<h3><i class=\"fa-solid fa-file\"></i> <a href=\"/file{}\">{}</a></h3>".format(f"{path}/{filename}", filename)
-    result = result.format(config['repo']['name'], path, tree)
+            tree += "<h3><i class=\"fa-solid fa-file\"></i> <a href=\"/{}/file{}\">{}</a></h3>".format(repo, f"{path}/{filename}", filename)
+    result = result.format(config["repo-" + repo]['name'], path, tree)
     return result
 
-def show_file(path): # <link href="https://prismjs.com/plugins/line-numbers/prism-line-numbers.css" rel="stylesheet">
+def show_file(repo, path):
     result = ftemplate
-    req = requests.get(config["repo"]["rawurl"] + "/" + path)
+    req = requests.get(config["repo-" + repo]["rawurl"] + "/" + path)
     parents = []
     pathpar = pathlib.Path(path).parent
     while pathpar.name != "":
         parents.append(pathpar)
         pathpar = pathlib.Path(pathpar).parent
     parents.reverse()
-    pathpar = f"<a href=\"/dir\">{config['repo']['name']}</a>/"
+    pathpar = f"<a href=\"/{repo}/dir\">{config['repo-' + repo]['name']}</a>/"
     for parent in parents:
-        pathpar += f"<a href=\"/dir/{str(parent)}\">{parent.name}</a>/"
+        pathpar += f"<a href=\"/{repo}/dir/{str(parent)}\">{parent.name}</a>/"
     pathfile = pathlib.Path(path).name
     if pathlib.Path(path).name in ["Makefile", "makefile"]:
         lang = "makefile"
     else:
         lang = languages.get(pathlib.Path(path).suffix, "plaintext")
-    result = result.format(config['repo']['name'], path, f"<h2>{pathpar}{pathfile}</h2><pre><code class=\"language-{lang} line-numbers\">{html.escape(req.text)}</code></pre>")
+    result = result.format(config["repo-" + repo]['name'], path, f"<h2>{pathpar}{pathfile}</h2><pre><code class=\"language-{lang} line-numbers\">{html.escape(req.text)}</code></pre>")
     return result
 
-@app.route('/dir/<path:path>')
-def dir(path):
-    return get_dir_list("/" + path)
+@app.route('/<repo>/dir/<path:path>')
+def dir(repo, path):
+    return get_dir_list(repo, "/" + path)
 
-@app.route('/dir')
-def dirroot():
-    return get_dir_list("")
+@app.route('/<repo>/dir')
+def dirroot(repo):
+    return get_dir_list(repo, "")
 
-@app.route('/file/<path:path>')
-def file(path):
-    return show_file(path)
+@app.route('/<repo>/file/<path:path>')
+def file(repo, path):
+    return show_file(repo, "/" + path)
 
 @app.route('/style/<path:path>')
 def style(path):
