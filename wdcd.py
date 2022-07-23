@@ -58,12 +58,14 @@ ftemplate = """
 <link rel="stylesheet" href="/style/apprentice.css">
 <link href="/style/prism-apprentice.css" rel="stylesheet">
 <link href="https://prismjs.com/plugins/line-numbers/prism-line-numbers.css" rel="stylesheet">
+<link rel="stylesheet" href="https://prismjs.com/plugins/line-highlight/prism-line-highlight.css" data-noprefix="">
 </head>
 <body>
 {}
-<script src=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js\"></script>
+<script src=\"https://prismjs.com/prism.js\"></script>
 <script src=\"https://prismjs.com/plugins/line-numbers/prism-line-numbers.js\"></script>
 <script src=\"https://prismjs.com/plugins/autoloader/prism-autoloader.js\"></script>
+<script src=\"https://prismjs.com/plugins/line-highlight/prism-line-highlight.js\"></script>
 </body>
 </html>
 """
@@ -133,13 +135,13 @@ def show_file(repo, path):
     parents.reverse()
     pathpar = f"<a href=\"/{repo}/dir\">{config['repo-' + repo]['name']}</a>/"
     for parent in parents:
-        pathpar += f"<a href=\"/{repo}/dir/{str(parent)}\">{parent.name}</a>/"
+        pathpar += f"<a href=\"/{repo}/dir{str(parent)}\">{parent.name}</a>/"
     pathfile = pathlib.Path(path).name
     if pathlib.Path(path).name in ["Makefile", "makefile"]:
         lang = "makefile"
     else:
         lang = languages.get(pathlib.Path(path).suffix, "plaintext")
-    result = result.format(config["repo-" + repo]['name'], path, f"<h2>{pathpar}{pathfile}</h2><pre><code class=\"language-{lang} line-numbers\">{html.escape(req.text)}</code></pre>")
+    result = result.format(config["repo-" + repo]['name'], path, f"<h2>{pathpar}{pathfile}</h2><pre class=\"linkable-line-numbers\" id=\"code\"><code class=\"language-{lang} line-numbers\">{html.escape(req.text)}</code></pre>")
     return result
 
 @app.route('/<repo>/dir/<path:path>')
