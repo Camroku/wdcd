@@ -14,6 +14,7 @@
 # License along with Toryus. If not, see
 # <https://www.gnu.org/licenses/>. 
 
+#region Init
 import sys
 import configparser
 import flask
@@ -25,7 +26,8 @@ import pathlib
 if not len(sys.argv) == 2:
     print("Usage: {} <config file>".format(sys.argv[0]))
     sys.exit(1)
-
+#endregion
+#region Templates
 template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +71,284 @@ ftemplate = """
 </body>
 </html>
 """
+#endregion
+#region Stylesheets
+apprentice_css = """/*
+This stylesheet is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
 
+This stylesheet is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this stylesheet. If not, see <https://www.gnu.org/licenses/>. 
+*/
+
+body {
+    background-color: #262626;
+    color: #BCBCBC;
+    font-family: monospace; /* delete/comment this line if you use another
+                            font. i wrote this because it's hard to read a
+                            text with default browser font, and monospace
+                            fonts are my favorites. */
+}
+
+blockquote {
+    border-left: 2px solid #444444;
+    padding-left: 10px;
+}
+
+table {
+    border: 1px solid #444444;
+    border-collapse: collapse;
+}
+
+th, td, table caption {
+    border: 1px solid #444444;
+    padding: 5px;
+}
+
+tr:nth-child(even) {
+    background-color: #1C1C1C;
+}
+
+th {
+    background-color: #303030;
+}
+
+a:link {
+    color: #5f87af;
+}
+
+a:visited {
+    color: #8787af;
+}
+
+a:active {
+    color: #af5f5f;
+}
+
+mark {
+    background-color: #FFFFAF;
+}
+
+iframe {
+    border: 1px solid #444444;
+}
+
+fieldset {
+    border: 1px solid #444444;
+}
+
+input, textarea, button {
+    background-color: #303030;
+    border: 1px solid #444444;
+    color: #BCBCBC;
+}
+
+button[disabled], input[disabled] {
+    background-color: #262626;
+    border: 1px solid #303030;
+    color: #585858;
+}
+
+input[type="file"]::file-selector-button, input[type="file"]::-webkit-file-upload-button {
+    background-color: #303030;
+    border: none;
+    border-right: 1px solid #444444;
+    color: #BCBCBC;
+}
+
+select {
+    background-color: #303030;
+    border: 1px solid #444444;
+    color: #BCBCBC;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+}
+
+input[type="range"]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 5px;
+    cursor: pointer;
+    background: #5F87AF;
+    border-radius: 3px;
+    border: 1px solid #303030;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    border: 1px solid #303030;
+    height: 15px;
+    width: 15px;
+    border-radius: 3px;
+    background: #BCBCBC;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -6px;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #5F87AF;
+}
+
+input[type="range"]::-moz-range-track {
+    cursor: pointer;
+    background: #5F87AF;
+    border-radius: 3px;
+    border: 1px solid #303030;
+}
+
+input[type="range"]::-moz-range-thumb {
+    border: 1px solid #303030;
+    border-radius: 3px;
+    background: #BCBCBC;
+    cursor: pointer;
+}"""
+
+prism_apprentice_css = """/**
+* Apprentice Theme Originally by Jeet Sukumaran
+* https://romainl.github.io/Apprentice/
+*
+* Ported for PrismJS by Cinar Yilmaz
+* Based on Nord for PrismJS (except colors)
+* https://github.com/PrismJS/prism-themes/blob/master/themes/prism-nord.css
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+    color: #BCBCBC;
+    background: none;
+    font-family: monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    padding: 0;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+    padding: 1em;
+    margin: .5em 0;
+    overflow: auto;
+    border-radius: 0.3em;
+    border: #111111 1px solid;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    background: #1C1C1C;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+    padding: .1em;
+    border-radius: .3em;
+    white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #6C6C6C;
+}
+
+.token.punctuation {
+    color: #BCBCBC;
+}
+
+.namespace {
+    opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+    color: #8FAFD7;
+}
+
+.token.number {
+    color: #FFFFAF;
+}
+
+.token.boolean {
+    color: #8FAFD7;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+    color: #87AF87;
+}
+
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+    color: #FFFFAF;
+}
+
+
+.token.operator {
+    color: #5FAFAF;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+    color: #5FAFAF;
+}
+
+.token.keyword {
+    color: #8787AF;
+}
+
+.token.regex,
+.token.important {
+    color: #FFFFAF;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}"""
+#endregion
+#region Languages
 languages = { # by file extensions
     ".c": "c",
     ".h": "c",
@@ -83,13 +362,23 @@ languages = { # by file extensions
     ".s": "nasm",
     ".mk": "makefile",
 }
-
+#endregion
+#region Application
 app = flask.Flask(__name__)
 app.url_map.strict_slashes = False
 
 config = configparser.ConfigParser()
 config.read(sys.argv[1])
 
+@app.before_request
+def clear_trailing():
+    from flask import redirect, request
+
+    rp = request.path 
+    if rp != '/' and rp.endswith('/'):
+        return redirect(rp[:-1])
+#endregion
+#region Routes
 @app.route('/')
 def index():
     repos = []
@@ -156,16 +445,23 @@ def dirroot(repo):
 def file(repo, path):
     return show_file(repo, "/" + path)
 
-@app.route('/style/<path:path>')
-def style(path):
-    return flask.send_from_directory('style', path)
+@app.route('/style/apprentice.css')
+def apprentice():
+    response = app.response_class(
+        response=apprentice_css,
+        status=200,
+        mimetype='text/css'
+    )
+    return response
 
-@app.before_request
-def clear_trailing():
-    from flask import redirect, request
-
-    rp = request.path 
-    if rp != '/' and rp.endswith('/'):
-        return redirect(rp[:-1])
+@app.route('/style/prism-apprentice.css')
+def prism_apprentice():
+    response = app.response_class(
+        response=prism_apprentice_css,
+        status=200,
+        mimetype='text/css'
+    )
+    return response
+#endregion
 
 app.run(debug=True, port=int(config["server"]["port"]))
