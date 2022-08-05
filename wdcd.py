@@ -68,6 +68,7 @@ ftemplate = """
 <script src=\"https://prismjs.com/plugins/line-numbers/prism-line-numbers.js\"></script>
 <script src=\"https://prismjs.com/plugins/autoloader/prism-autoloader.js\"></script>
 <script src=\"https://prismjs.com/plugins/line-highlight/prism-line-highlight.js\"></script>
+<script src=\"https://qolang.camroku.tech/scripts/qo-prism/qo-prism.js\"></script>
 </body>
 </html>
 """
@@ -387,6 +388,7 @@ languages = { # by file extensions
     ".json": "json",
     ".css": "css",
     ".ini": "ini",
+    ".qo": "qo",
 }
 #endregion
 #region Application
